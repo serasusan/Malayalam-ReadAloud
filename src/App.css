@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+#root {
+  
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.logo:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+header{
+  padding-top: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.heading{
+text-align: center;
+font-family: Montserrat;
+font-size: 4rem;
+font-weight: 700;
+line-height: 70px; /* 97.912% */
+letter-spacing: -3.6px;
+}
+
+.sub-heading{
+  font-family: "Inter", sans-serif;
+  padding: 2rem 0;
+}
+
+button{
+  padding: 0.7rem 2.5rem;
+  border: 1px solid #505967;
+  background: #1D1E20;
+  box-shadow: 0px 1px 0px 0px rgba(27, 31, 35, 0.20);
+  color: #EDEEF0;
+  text-align: center;
+  font-family: Inter;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px; /* 133.333% */
+  letter-spacing: -0.2px;
+}
+
+
+.about-us-head{
+  color: #1D1E20;
+text-align: center;
+font-family: Montserrat;
+font-size: 15px;
+font-style: normal;
+font-weight: 400;
+line-height: 57.2px; /* 228.8% */
+letter-spacing: -1.2px;
+}
+
+.about-us-subhead{
+  color: #31373D;
+-webkit-text-stroke-width: 1;
+-webkit-text-stroke-color: #000;
+font-family: Inter;
+font-size: 25px;
+font-family: "Inter", sans-serif;
+font-weight: 700;
+line-height: 30.8px; /* 77% */
+letter-spacing: -0.9px;
+}
+
+.about-us-content{
+  color: #505967;
+text-align: center;
+font-family: Inter;
+font-size: 13px;
+font-style: normal;
+font-weight: 400;
+line-height: 14px; /* 120% */
+}
