@@ -82,3 +82,38 @@ font-style: normal;
 font-weight: 400;
 line-height: 14px; /* 120% */
 }
+
+input[type="file"] {
+  display: none;
+}
+#input-container {
+  margin-top: 2rem;
+}
+
+#input-container div {
+  display: inline-block;
+  margin-right: 1rem;
+}
+
+#loading,
+#error {
+  margin-top: 2rem;
+  margin-bottom: 3rem;
+}
+
+#loading {
+  display: none;
+}
+
+input[type="file"] {
+  display: block;
+}
+
+#input-container {
+  margin-top: 2rem;
+}
+
+#input-container div {
+  display: inline-block;
+  margin-right: 1rem;
+}

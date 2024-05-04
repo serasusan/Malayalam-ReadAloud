@@ -1,11 +1,164 @@
 import logo from './assets/logo.png'
 import preview from './assets/preview.png'
-// import bg from './assets/bg.png'
+import LanguageSelect from './LanguageSelect';
+import  { useState } from 'react';
+import ClearResults from './ClearResults';
+import { pdfjs } from "react-pdf";
 import './App.css'
+import Tesseract from "tesseract.js";
+
+
 function App() {
+  const languages = [
+    { name: "English", code: "eng" },
+    { name: "Hindi", code: "hin" },
+    { name: "Malayalam", code: "mal" },   
+  ];
+  
+  pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+
+  const initialLanguage = "eng"; // Set the initial language code here
+
+
+  // const count = "ദുബായിലേക്കുള്ള വിമാനങ്ങള്‍ റദ്ദാക്കിയതില്‍ നെടുമ്പാശേരി വിമാനത്താവളത്തിൽ യാത്രക്കാരുടെ പ്രതിഷേധം. മുന്നറിയിപ്പില്ലാതെയാണ്‌ വിമാനങ്ങള്‍ റദ്ദാക്കിയതെന്ന്‌ യാത്രക്കാര്‍ ആരോപിച്ചു. നെടുമ്പാശേരി യിൽ നിന്നും ദുബായിലേക്കുള്ള മൂന്ന്‌ വിമാനങ്ങളും ദോഹയിലേക്കും ഷാര്‍ജയിലേക്കും ഉള്ള ഓരോ വിമാനങ്ങളുമാണ്‌ റദ്ദാക്കിയത്‌.";
+  const [audioSrc, setAudioSrc] = useState("");
+
+
+  const [LanguageSelected, setLanguageSelected] = useState(null);
+  const handleLanguageChange = (selectedLanguage) => {
+  setLanguageSelected(selectedLanguage);
+  };
+  //Query for TTS
+  const  query = async(text) => {
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/facebook/mms-tts-mal",
+      {
+        headers: { Authorization: "Bearer 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" },
+        method: "POST",
+        body: JSON.stringify(text),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch audio from the API.");
+    }
+    console.log(response)
+      const result = await response.blob();
+       // Generate a URL for the Blob object
+       const audioUrl = URL.createObjectURL(result);
+
+       // Set the audio source
+       setAudioSrc(audioUrl);
+      //return result;
+    }
+
+    
+    const readFile = (file) => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.addEventListener("loadend", (event) =>
+          resolve(new Uint8Array(event.target.result))
+        );
+        reader.readAsArrayBuffer(file);
+      });
+    };
+
+    const convertToImage = async (pdf) => {
+      const container = document.getElementById("container");
+      const images = [];
+      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+        const page = await pdf.getPage(pageNumber);
+        const viewport = page.getViewport({ scale: 1.5 });
+        const canvas = document.createElement("canvas");
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        container.appendChild(canvas);
+        await page.render({
+          canvasContext: canvas.getContext("2d"),
+          viewport: viewport,
+        }).promise;
+        images.push(canvas.toDataURL("image/png"));
+      }
+      return images;
+    };
+
+    const convertToText = async (images) => {
+      const worker = await Tesseract.createWorker();
+      await worker.loadLanguage(LanguageSelected);
+      if(LanguageSelected){
+        await worker.reinitialize(LanguageSelected);
+      }
+      else{
+        console.warn("Selected language not available, skipping initialization.");
+      }
+
+      const container = document.getElementById("container");
+      let extractedText = '';
+      for (const image of images) {
+        const {
+          data: { text },
+        } = await worker.recognize(image);
+        extractedText += text + ' '; // Append the extracted text to the existing text
+        const section = document.createElement("section");
+        const pre = document.createElement("pre");
+        pre.appendChild(document.createTextNode(text));
+        section.appendChild(pre);
+        container.appendChild(section);
+      }
+      query(extractedText);
+
+
+      await worker.terminate();
+    };
+
+    const loadFile = async (file) =>
+      pdfjs.getDocument({ data: file }).promise;
+
+    const convertFile = async (file) => {
+      showLoading();
+      const pdf = await loadFile(file);
+      const images = await convertToImage(pdf);
+      await convertToText(images);
+      hideLoading();
+    };
+
+    const showLoading = () =>
+      (document.getElementById("loading").style.display = "block");
+
+    const hideLoading = () =>
+      (document.getElementById("loading").style.display = "none");
+
+    const showError = (error) =>
+      document
+        .getElementById("error")
+        .appendChild(document.createTextNode(`Error: ${error.message}`));
+
+    const clearResults = () => {
+      ["container", "loading", "error"].forEach((id) => {
+        let element = document.getElementById(id);
+        // element.remove();
+        element = document.createElement("div");
+        element.id = id;
+        if (id === "loading") {
+          element.appendChild(document.createTextNode("Loading..."));
+        }
+        document.body.appendChild(element);
+      });
+    };
+
+    const handleFileChange = async (event) => {
+      clearResults();
+      try {
+        await convertFile(await readFile(event.target.files[0]));
+      } catch (error) {
+        hideLoading();
+        showError(error);
+      }
+    };
+        
 
   return (
     <>
+    {/* Navbar */}
     <nav className='flex bg-white justify-start'>
        <img src={logo} alt='logo' className='logo' />
     </nav>
@@ -22,7 +175,7 @@ function App() {
         Experience Malayalam , Spoken Just for You!
       </div>
       <button className='rounded-lg' >Select PDF</button>
-      <div className='container flex items-center justify-center	 p-10'>
+      <div className='container flex items-center justify-center   p-10'>
           <img src={preview} className='' alt="ng" />
       </div>
       <div className='about-us w-2/5'>
@@ -35,61 +188,34 @@ function App() {
         <div className='about-us-content p-3'>
           Our mission is to enrich lives by crafting an inclusive Malayalam read-aloud platform, fostering accessibility for all—empowering learners, the visually impaired, and language enthusiasts alike.
         </div>
-
       </div>
     </header>
 
+    {/* Input Container */}
+    <div id="input-container">
+      <h1>PDF Reader</h1>
+      <LanguageSelect languages={languages} initialLanguage={initialLanguage} onLanguageChange={handleLanguageChange}/>
+      
+      <p>Selected Language: {LanguageSelected}</p> {/* Display the selected language */}
 
-      {/* <div className="w-[1440px] h-[1274.95px] pt-8 bg-white justify-end items-center inline-flex">
-  <div className="w-[1446px] h-[1275px] relative flex-col justify-start items-start flex">
-    <div className="h-[176.63px] justify-end items-center inline-flex">
-      <div className="w-[853px] h-[180px] text-center text-zinc-900 text-[90.20px] font-bold font-['Montserrat'] leading-[88.32px]">Malayalam<br/>Spoken Experience</div>
-    </div>
-    <div className="w-[1446px] h-[1019.99px] bg-neutral-50" />
-    <div className="w-[550px] h-[61.59px] pt-0.5 pb-[2.80px] justify-center items-center inline-flex">
-      <div className="w-[550.11px] h-[56.79px] text-center text-neutral-700 text-[22px] font-medium font-['Inter'] leading-[30.80px]">Experience Malayalam , Spoken Just for You!</div>
-    </div>
-    <div className="w-[267.75px] justify-center items-center inline-flex">
-      <div className="grow shrink basis-0 h-[65px] pl-[93px] pr-[92.13px] pt-5 pb-[21px] bg-zinc-900 rounded-xl shadow border border-gray-600 justify-center items-center inline-flex">
-        <div className="w-[95.87px] h-6 text-center text-gray-100 text-lg font-medium font-['Inter'] leading-normal">Select PDF </div>
+      <div>
+        <label id="file-input-label" htmlFor="file-input">Select a file</label><br />
+        <input type="file" id="file-input" name="file-input" onChange={handleFileChange} multiple />
       </div>
     </div>
-    <div className="w-[1392px] h-[710.73px] relative">
-      <div className="w-[1264px] h-[843px] left-[64px] top-0 absolute">
-        <div className="w-[1264px] h-[726.80px] left-[-0px] top-[88.51px] absolute">
-          <div className="w-[1264px] h-[1015.94px] left-0 top-[-289.14px] absolute">
-          </div>
-        </div>
+    <div className='p-2'>
+        <button onClick={query}>Send Request</button>
+      
+        {audioSrc && (
+          <audio controls>
+            <source src={audioSrc} type="audio/mpeg" />
+            Your browser does not support the audio element.
+          </audio>
+        )}
       </div>
-      <div className="w-[948px] h-[533.05px] left-[222px] top-[148.04px] absolute bg-white bg-opacity-0 shadow">
-        <img className="w-[948px] h-[533.05px] left-0 top-0 absolute" src="https://via.placeholder.com/948x533" />
-        <div className="w-[111.62px] h-[111.62px] left-[418.19px] top-[202.83px] absolute opacity-10 bg-blue-600 rounded-[111.62px] border border-white" />
-        <div className="w-[63px] h-[63px] left-[442.50px] top-[227.14px] absolute opacity-30 bg-blue-600 rounded-[63px] border border-white" />
-        <div className="w-[62.96px] h-[62.96px] p-[19.79px] left-[442.52px] top-[227.16px] absolute bg-zinc-700 rounded-[62.96px] shadow border border-gray-700 justify-center items-center inline-flex">
-          <div className="grow shrink basis-0 self-stretch pl-[5.85px] pr-[1.67px] py-[2.79px] justify-end items-center inline-flex" />
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<div className="w-[1440px] h-[364px] relative bg-white" />
-<div className="w-[1155px] h-[311px] relative">
-  <div className="pl-[140px] pr-[91px] pt-[9.73px] pb-[46.24px] left-0 top-[132.27px] absolute flex-col justify-start items-center gap-[24.41px] inline-flex">
-    <div className="self-stretch h-[61.59px] pr-14 pt-0.5 justify-start items-center inline-flex">
-      <div className="w-[424px] h-[84px] text-neutral-700 text-[40px] font-medium font-['Inter'] leading-[30.80px]">We&apos;re a Squad of Five</div>
-    </div>
-    <div className="w-[924px] h-[50px] text-center text-gray-600 text-xl font-normal font-['Inter'] leading-normal">Our mission is to enrich lives by crafting an inclusive Malayalam read-aloud platform, fostering accessibility for all—empowering learners, the visually impaired, and language enthusiasts alike.</div>
-  </div>
-  <div className="w-[155px] h-[27px] left-[497px] top-[115px] absolute text-center text-zinc-900 text-[25px] font-normal font-['Montserrat'] leading-[57.20px]">About Us</div>
-  <div className="w-[1155px] h-[1073.78px] left-0 top-[404.24px] absolute" />
-</div>
-<div className="w-[1440px] h-32 pl-6 pr-[1171.14px] pt-[42px] pb-[46px] bg-white justify-start items-center gap-[126.86px] inline-flex">
-  <div className="w-[100px] h-10 relative flex-col justify-start items-start flex" />
-  <div className="w-[18px] h-[18px] px-[5.25px] justify-center items-center inline-flex" />
-</div> */}
+      <ClearResults />
     </>
   )
 }
 
 export default App
-
