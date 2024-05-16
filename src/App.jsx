@@ -4,11 +4,14 @@ import LanguageSelect from './LanguageSelect';
 import  { useState } from 'react';
 import ClearResults from './ClearResults';
 import { pdfjs } from "react-pdf";
-import './App.css'
-import Tesseract from "tesseract.js";
+import './App.css';
 
 
+// import Tesseract from "tesseract.js";
+import { useNavigate } from 'react-router-dom';
 function App() {
+  // const [pdfData, setPdfData] = useState(null);
+
   const languages = [
     { name: "English", code: "eng" },
     { name: "Hindi", code: "hin" },
@@ -17,7 +20,7 @@ function App() {
   
   pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-  const initialLanguage = "eng"; // Set the initial language code here
+  const initialLanguage = 'eng'; // Set the initial language code here
 
 
   // const count = "ദുബായിലേക്കുള്ള വിമാനങ്ങള്‍ റദ്ദാക്കിയതില്‍ നെടുമ്പാശേരി വിമാനത്താവളത്തിൽ യാത്രക്കാരുടെ പ്രതിഷേധം. മുന്നറിയിപ്പില്ലാതെയാണ്‌ വിമാനങ്ങള്‍ റദ്ദാക്കിയതെന്ന്‌ യാത്രക്കാര്‍ ആരോപിച്ചു. നെടുമ്പാശേരി യിൽ നിന്നും ദുബായിലേക്കുള്ള മൂന്ന്‌ വിമാനങ്ങളും ദോഹയിലേക്കും ഷാര്‍ജയിലേക്കും ഉള്ള ഓരോ വിമാനങ്ങളുമാണ്‌ റദ്ദാക്കിയത്‌.";
@@ -51,78 +54,80 @@ function App() {
       //return result;
     }
 
+
     
-    const readFile = (file) => {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.addEventListener("loadend", (event) =>
-          resolve(new Uint8Array(event.target.result))
-        );
-        reader.readAsArrayBuffer(file);
-      });
-    };
+    // const readFile = (file) => {
+    //   return new Promise((resolve) => {
+    //     const reader = new FileReader();
+    //     reader.addEventListener("loadend", (event) =>
+    //       resolve(new Uint8Array(event.target.result))
+    //     );
+    //     reader.readAsArrayBuffer(file);
+    //   });
+    // };
 
-    const convertToImage = async (pdf) => {
-      const container = document.getElementById("container");
-      const images = [];
-      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-        const page = await pdf.getPage(pageNumber);
-        const viewport = page.getViewport({ scale: 1.5 });
-        const canvas = document.createElement("canvas");
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-        container.appendChild(canvas);
-        await page.render({
-          canvasContext: canvas.getContext("2d"),
-          viewport: viewport,
-        }).promise;
-        images.push(canvas.toDataURL("image/png"));
-      }
-      return images;
-    };
+    // const convertToImage = async (pdf) => {
+    //   const container = document.getElementById("container");
+    //   const images = [];
+    //   for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+    //     const page = await pdf.getPage(pageNumber);
+    //     const viewport = page.getViewport({ scale: 1.5 });
+    //     const canvas = document.createElement("canvas");
+    //     canvas.height = viewport.height;
+    //     canvas.width = viewport.width;
+    //     container.appendChild(canvas);
+    //     await page.render({
+    //       canvasContext: canvas.getContext("2d"),
+    //       viewport: viewport,
+    //     }).promise;
+    //     images.push(canvas.toDataURL("image/png"));
+    //   }
+    //   return images;
+    // };
 
-    const convertToText = async (images) => {
-      const worker = await Tesseract.createWorker();
-      await worker.loadLanguage(LanguageSelected);
-      if(LanguageSelected){
-        await worker.reinitialize(LanguageSelected);
-      }
-      else{
-        console.warn("Selected language not available, skipping initialization.");
-      }
+    // const convertToText = async (images) => {
+    //   const worker = await Tesseract.createWorker();
+    //   await worker.loadLanguage(LanguageSelected);
+    //   if(LanguageSelected){
+    //     await worker.reinitialize(LanguageSelected);
+    //   }
+    //   else{
+    //     console.warn("Selected language not available, skipping initialization.");
+    //   }
 
-      const container = document.getElementById("container");
-      let extractedText = '';
-      for (const image of images) {
-        const {
-          data: { text },
-        } = await worker.recognize(image);
-        extractedText += text + ' '; // Append the extracted text to the existing text
-        const section = document.createElement("section");
-        const pre = document.createElement("pre");
-        pre.appendChild(document.createTextNode(text));
-        section.appendChild(pre);
-        container.appendChild(section);
-      }
-      query(extractedText);
+    //   const container = document.getElementById("container");
+    //   let extractedText = '';
+    //   for (const image of images) {
+    //     const {
+    //       data: { text },
+    //     } = await worker.recognize(image);
+    //     extractedText += text + ' '; // Append the extracted text to the existing text
+    //     const section = document.createElement("section");
+    //     const pre = document.createElement("pre");
+    //     pre.appendChild(document.createTextNode(text));
+    //     section.appendChild(pre);
+    //     container.appendChild(section);
+    //   }
+    //   query(extractedText);
 
 
-      await worker.terminate();
-    };
+    //   await worker.terminate();
+    // };
 
-    const loadFile = async (file) =>
-      pdfjs.getDocument({ data: file }).promise;
+    // const loadFile = async (file) =>
+    //   pdfjs.getDocument({ data: file }).promise;
 
-    const convertFile = async (file) => {
-      showLoading();
-      const pdf = await loadFile(file);
-      const images = await convertToImage(pdf);
-      await convertToText(images);
-      hideLoading();
-    };
+    // const convertFile = async (file) => {
+    //     showLoading();
+    //     const pdf = await loadFile(file);
+    //     const images = await convertToImage(pdf);
+    //     await convertToText(images);
+    //     hideLoading();
+    //     return file;
+    //   };
 
-    const showLoading = () =>
-      (document.getElementById("loading").style.display = "block");
+    // const showLoading = () =>
+    //   (document.getElementById("loading").style.display = "block");
 
     const hideLoading = () =>
       (document.getElementById("loading").style.display = "none");
@@ -144,22 +149,45 @@ function App() {
         document.body.appendChild(element);
       });
     };
+    //working code
+    // const handleFileChange = async (event) => {
+    //   clearResults();
+    //   try {
+    //     await convertFile(await readFile(event.target.files[0]));
+    //     // navigate('/fileView', { state: { file } });
+
+    //   } catch (error) {
+    //     hideLoading();
+    //     showError(error);
+    //   }
+    // };
+    const navigate = useNavigate();  
 
     const handleFileChange = async (event) => {
-      clearResults();
-      try {
-        await convertFile(await readFile(event.target.files[0]));
-      } catch (error) {
-        hideLoading();
-        showError(error);
+
+      const file = event.target.files[0];
+      console.log('Fileeeeeeee:', file);
+    
+      if (file && file.type === 'application/pdf') {
+        clearResults();
+        try {
+          navigate('pdfView', { state: { pdf: file } });
+        } catch (error) {
+          hideLoading();
+          showError(error);
+        }
+      } else {
+        console.error('Please select a PDF file.');
       }
     };
         
 
   return (
+
     <>
+  
     {/* Navbar */}
-    <nav className='flex bg-white justify-start'>
+    <nav className=' bg-white '>
        <img src={logo} alt='logo' className='logo' />
     </nav>
     <header>
@@ -174,7 +202,16 @@ function App() {
       <div className='sub-heading text-center p-3'>
         Experience Malayalam , Spoken Just for You!
       </div>
-      <button className='rounded-lg' >Select PDF</button>
+        {/* <button className='rounded-lg' onChange={handleFileChange} >Select PDF</button> */}
+      <div>
+        {/* <label id="file-input-label" htmlFor="file-input">Select a file</label><br /> */}
+        <input className="block w-full text-sm text-slate-500
+      file:mr-4 file:py-4 file:px-7 
+      file:rounded-lg file:border-0
+      file:text-sm font-medium	
+      file:bg-black file:text-zinc-100
+      hover:file:bg-black" type="file" id="file-input" name="file-input" onChange={handleFileChange}  />
+      </div>
       <div className='container flex items-center justify-center   p-10'>
           <img src={preview} className='' alt="ng" />
       </div>

@@ -1,0 +1,11 @@
+{
+    "name":"malayalam ReadAloud",
+    "description":"malayalam ReadAloud",
+    "version":"1.0",
+    "manifest_version":3,
+    "author":"Sera",
+    "action":{
+        "default_popup":"index.html",
+        "default_title":"malayalam ReadAloud"
+    }
+}

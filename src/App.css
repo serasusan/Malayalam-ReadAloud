@@ -10,6 +10,11 @@
   padding: 2rem;
 }
 
+.logo{
+  width: 100px;
+  padding-left: 1rem;
+}
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -117,3 +122,4 @@ input[type="file"] {
   display: inline-block;
   margin-right: 1rem;
 }
+
