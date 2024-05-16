@@ -19,6 +19,6 @@ Planning to implement the following:
 2. If not implement emotional analysis.
 3. Try seeing what can be done to properly extract Malayalam text. I've used Tesseract.js library and it is actually compatible with almost all languages including Malayalam. But I don't know what is going wrong.
 
-Update
+### Update
 Implemented the same using the Bhashini API. Now the Text-to-Speech (TTS) functionality works seamlessly. Additionally, it dynamically adjusts pitch and pauses based on the content. 
 [[Implemented Bhashini API]](https://drive.google.com/file/d/1v5uhuDV-HltjrFwo96h61kyxx6lPWzBV/view?usp=drive_link)
