@@ -2,7 +2,7 @@
 Similar to the ReadAloud feature available in Edge for English, Malayalam ReadAloud is tailored specifically for the Malayalam language. It is designed to support children with learning disabilities, visual impairments, and individuals learning Malayalam as a new language. Research conducted in Turkey involving 62 second-grade students explored the impact of interactive reading aloud on student reading comprehension, motivation, and fluency and this is what motivated to work on this project.
 
 Attached is a video showcasing the functionality of the website:
-[![Malayalam ReadAloud Video](https://drive.google.com/your-video-link)](https://drive.google.com/your-video-link)
+[[Malayalam ReadAloud - First Update]](https://drive.google.com/file/d/1nqvTu1WQ-MGHviToNGJGjxOwNowVkYzO/view?usp=sharing)
 
 Current Challenges:
 
@@ -21,3 +21,4 @@ Planning to implement the following:
 
 Update
 Implemented the same using the Bhashini API. Now the Text-to-Speech (TTS) functionality works seamlessly. Additionally, it dynamically adjusts pitch and pauses based on the content. 
+[[Implemented Bhashini API]](https://drive.google.com/file/d/1v5uhuDV-HltjrFwo96h61kyxx6lPWzBV/view?usp=drive_link)
