@@ -6,7 +6,11 @@ import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import Tesseract from "tesseract.js";
 import bhashini from 'bhashini-translation';
+// import dotenv from 'dotenv';
+// dotenv.config();
+
 bhashini.auth("4fb15b1ad4924f5faa4f558c34e6352c", "106e8b4dbc-84c1-41b9-b9f9-e664491568df", "nSyJDO2w2ePK25OFxs4U371jdFIUyT8IwF9tei8IksSzA3D9bWNqwCbou2z2dyKq");
+// bhashini.auth(process.env.REACT_APP_USER_ID, process.env.REACT_APP_ULCA_API_KEY, process.env.REACT_APP_INFERENCE_API_KEY);
 import logo from './assets/logo.png';
 
 function PdfView() {

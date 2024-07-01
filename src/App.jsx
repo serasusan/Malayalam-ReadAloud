@@ -7,10 +7,8 @@ import { pdfjs } from "react-pdf";
 import './App.css';
 
 
-// import Tesseract from "tesseract.js";
 import { useNavigate } from 'react-router-dom';
 function App() {
-  // const [pdfData, setPdfData] = useState(null);
 
   const languages = [
     { name: "English", code: "eng" },
@@ -55,80 +53,6 @@ function App() {
     }
 
 
-    
-    // const readFile = (file) => {
-    //   return new Promise((resolve) => {
-    //     const reader = new FileReader();
-    //     reader.addEventListener("loadend", (event) =>
-    //       resolve(new Uint8Array(event.target.result))
-    //     );
-    //     reader.readAsArrayBuffer(file);
-    //   });
-    // };
-
-    // const convertToImage = async (pdf) => {
-    //   const container = document.getElementById("container");
-    //   const images = [];
-    //   for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-    //     const page = await pdf.getPage(pageNumber);
-    //     const viewport = page.getViewport({ scale: 1.5 });
-    //     const canvas = document.createElement("canvas");
-    //     canvas.height = viewport.height;
-    //     canvas.width = viewport.width;
-    //     container.appendChild(canvas);
-    //     await page.render({
-    //       canvasContext: canvas.getContext("2d"),
-    //       viewport: viewport,
-    //     }).promise;
-    //     images.push(canvas.toDataURL("image/png"));
-    //   }
-    //   return images;
-    // };
-
-    // const convertToText = async (images) => {
-    //   const worker = await Tesseract.createWorker();
-    //   await worker.loadLanguage(LanguageSelected);
-    //   if(LanguageSelected){
-    //     await worker.reinitialize(LanguageSelected);
-    //   }
-    //   else{
-    //     console.warn("Selected language not available, skipping initialization.");
-    //   }
-
-    //   const container = document.getElementById("container");
-    //   let extractedText = '';
-    //   for (const image of images) {
-    //     const {
-    //       data: { text },
-    //     } = await worker.recognize(image);
-    //     extractedText += text + ' '; // Append the extracted text to the existing text
-    //     const section = document.createElement("section");
-    //     const pre = document.createElement("pre");
-    //     pre.appendChild(document.createTextNode(text));
-    //     section.appendChild(pre);
-    //     container.appendChild(section);
-    //   }
-    //   query(extractedText);
-
-
-    //   await worker.terminate();
-    // };
-
-    // const loadFile = async (file) =>
-    //   pdfjs.getDocument({ data: file }).promise;
-
-    // const convertFile = async (file) => {
-    //     showLoading();
-    //     const pdf = await loadFile(file);
-    //     const images = await convertToImage(pdf);
-    //     await convertToText(images);
-    //     hideLoading();
-    //     return file;
-    //   };
-
-    // const showLoading = () =>
-    //   (document.getElementById("loading").style.display = "block");
-
     const hideLoading = () =>
       (document.getElementById("loading").style.display = "none");
 
@@ -149,18 +73,7 @@ function App() {
         document.body.appendChild(element);
       });
     };
-    //working code
-    // const handleFileChange = async (event) => {
-    //   clearResults();
-    //   try {
-    //     await convertFile(await readFile(event.target.files[0]));
-    //     // navigate('/fileView', { state: { file } });
-
-    //   } catch (error) {
-    //     hideLoading();
-    //     showError(error);
-    //   }
-    // };
+    
     const navigate = useNavigate();  
 
     const handleFileChange = async (event) => {
